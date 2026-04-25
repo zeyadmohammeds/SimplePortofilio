@@ -70,7 +70,7 @@ function About() {
             <div className="relative aspect-[4/5] rounded-[3rem] overflow-hidden bg-muted shadow-2xl shadow-black/10">
               <motion.img 
                 style={{ y: imgY, scale: 1.1 }}
-                src="/public/me.png" 
+                src="me.png" 
                 alt="Zeyad Mohammed"
                 className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
               />
