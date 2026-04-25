@@ -1,0 +1,239 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@0,400;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+@source "../src";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-surface: var(--surface);
+}
+
+:root {
+  --background: #FBFBF9;
+  --foreground: #1A1A1A;
+  
+  --card: rgba(255, 255, 255, 0.7);
+  --card-foreground: #1A1A1A;
+  
+  --primary: #FF4D00;
+  --primary-foreground: #FFFFFF;
+  
+  --muted: #F3F3F1;
+  --muted-foreground: #71717A;
+  
+  --accent: #FF4D00;
+  --accent-foreground: #FFFFFF;
+  
+  --border: rgba(0, 0, 0, 0.08);
+  --surface: #FBFBF9;
+
+  --radius: 24px;
+
+  /* Syntax Highlighting */
+  --syntax-key: #FF4D00;
+  --syntax-string: #4F46E5;
+  --syntax-number: #059669;
+  --syntax-bool: #D97706;
+  --syntax-null: #71717A;
+  --syntax-punct: #1A1A1A;
+}
+
+.dark {
+  --background: #0A0A0A;
+  --foreground: #E5E5E5;
+  
+  --card: rgba(20, 20, 20, 0.7);
+  --card-foreground: #E5E5E5;
+  
+  --primary: #FF4D00;
+  --primary-foreground: #FFFFFF;
+  
+  --muted: #1A1A1A;
+  --muted-foreground: #A1A1AA;
+  
+  --accent: #FF4D00;
+  --accent-foreground: #FFFFFF;
+  
+  --border: rgba(255, 255, 255, 0.1);
+  --surface: #0A0A0A;
+
+  /* Syntax Highlighting (Dark) */
+  --syntax-key: #FF6B00;
+  --syntax-string: #818CF8;
+  --syntax-number: #34D399;
+  --syntax-bool: #FBBF24;
+  --syntax-null: #A1A1AA;
+  --syntax-punct: #E5E5E5;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    background: var(--background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: transparent;
+    color: var(--color-foreground);
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 400;
+  }
+}
+
+@layer utilities {
+  .nav-rail {
+    background: rgba(244, 241, 234, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(229, 226, 219, 0.5);
+  }
+  
+  .dark .nav-rail {
+    background: rgba(10, 10, 10, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(36, 36, 36, 0.5);
+  }
+
+  .nav-pill {
+    border-radius: 9999px;
+    transition: all 0.2s ease;
+  }
+  
+  .pill-button {
+    border-radius: 9999px;
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    padding: 0.75rem 1.5rem;
+    font-family: var(--font-sans);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .pill-button-ghost {
+    border-radius: 9999px;
+    background-color: transparent;
+    color: var(--foreground);
+    border: 1px solid var(--border);
+    padding: 0.75rem 1.5rem;
+    font-family: var(--font-sans);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .pill-button:hover, .pill-button-ghost:hover {
+    transform: translateY(-2px);
+  }
+
+
+
+  .pill-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--foreground);
+    padding: 0.25rem 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  .responsive-shell {
+    width: min(100%, 82rem);
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .responsive-shell {
+      padding-inline: 3rem;
+    }
+  }
+
+  /* ─── Premium Scrollbars ─── */
+
+  .project-detail-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) transparent;
+  }
+
+  .project-detail-scroll::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  .project-detail-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .project-detail-scroll::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 9999px;
+  }
+
+  .project-detail-scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+  }
+
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 77, 0, 0.3) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 77, 0, 0.3);
+    border-radius: 9999px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+  }
+
+  .hide-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
