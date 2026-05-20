@@ -177,7 +177,7 @@ const endpointCards: EndpointCard[] = [
             type: "fullstack",
             stack: ["React", ".NET", "PostgreSQL"],
             year: 2024,
-            repo: "github.com/zeyad/new-system",
+            repo: "github.com/zeyadmohammeds/new-system",
             url: "new-system.dev"
           })
         }),
@@ -197,7 +197,7 @@ const endpointCards: EndpointCard[] = [
             type: "fullstack",
             stack: ["React", "Go", "PostgreSQL"],
             year: 2024,
-            repo: "github.com/zeyad/updated-system",
+            repo: "github.com/zeyadmohammeds/updated-system",
             url: "updated-system.dev"
           })
         }),

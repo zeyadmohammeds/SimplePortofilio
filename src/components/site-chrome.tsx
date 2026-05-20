@@ -227,7 +227,7 @@ export function SiteFooter() {
             </h2>
             <div className="mt-16 flex flex-wrap gap-4">
               <Magnetic strength={0.2}>
-                <a href="mailto:contact@zeyad.dev" className="h-14 flex items-center px-8 rounded-full bg-foreground text-background font-medium hover:scale-105 transition-transform shadow-xl shadow-black/10">
+                <a href="mailto:zeyad.shosha@outlook.com" className="h-14 flex items-center px-8 rounded-full bg-foreground text-background font-medium hover:scale-105 transition-transform shadow-xl shadow-black/10">
                   Get in touch
                 </a>
               </Magnetic>

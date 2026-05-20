@@ -17,7 +17,7 @@ import { RobotAssistant } from "@/components/3d/robot-assistant";
 import { Toaster } from "sonner";
 import { emitRobotAction, emitRobotIntent, emitRobotSequence } from "@/lib/robot-state";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
-import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/react";
 
 import appCss from "../styles.css?url";
 

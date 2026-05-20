@@ -62,7 +62,7 @@ function Contact() {
               <div className="space-y-12">
                 <div className="space-y-4">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">General Inquiries</span>
-                  <a href="mailto:contact@zeyad.dev" className="block text-3xl font-display hover:text-primary transition-colors">contact@zeyad.dev</a>
+                  <a href="mailto:zeyad.shosha@outlook.com" className="block text-3xl font-display hover:text-primary transition-colors">zeyad.shosha@outlook.com</a>
                 </div>
                 
                 <div className="space-y-4">
@@ -71,10 +71,10 @@ function Contact() {
                 </div>
 
                 <div className="flex gap-4 pt-8">
-                  <a href="#" className="h-12 w-12 rounded-full border border-border flex items-center justify-center hover:bg-foreground hover:text-background transition-all">
+                  <a href="https://github.com/zeyadmohammeds" target="_blank" rel="noreferrer" className="h-12 w-12 rounded-full border border-border flex items-center justify-center hover:bg-foreground hover:text-background transition-all">
                     <Github className="h-5 w-5" />
                   </a>
-                  <a href="#" className="h-12 w-12 rounded-full border border-border flex items-center justify-center hover:bg-foreground hover:text-background transition-all">
+                  <a href="https://linkedin.com/in/zeyadmohammeds" target="_blank" rel="noreferrer" className="h-12 w-12 rounded-full border border-border flex items-center justify-center hover:bg-foreground hover:text-background transition-all">
                     <Linkedin className="h-5 w-5" />
                   </a>
                 </div>

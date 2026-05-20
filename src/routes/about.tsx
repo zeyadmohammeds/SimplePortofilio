@@ -149,12 +149,12 @@ function About() {
                 </p>
                 <div className="pt-8 flex gap-4">
                   <Magnetic strength={0.3}>
-                    <a href="#" className="h-12 w-12 rounded-full border border-border flex items-center justify-center hover:bg-foreground hover:text-background transition-all">
+                    <a href="https://github.com/zeyadmohammeds" target="_blank" rel="noreferrer" className="h-12 w-12 rounded-full border border-border flex items-center justify-center hover:bg-foreground hover:text-background transition-all">
                       <Github className="h-5 w-5" />
                     </a>
                   </Magnetic>
                   <Magnetic strength={0.3}>
-                    <a href="#" className="h-12 w-12 rounded-full border border-border flex items-center justify-center hover:bg-foreground hover:text-background transition-all">
+                    <a href="https://linkedin.com/in/zeyadmohammeds" target="_blank" rel="noreferrer" className="h-12 w-12 rounded-full border border-border flex items-center justify-center hover:bg-foreground hover:text-background transition-all">
                       <Linkedin className="h-5 w-5" />
                     </a>
                   </Magnetic>
