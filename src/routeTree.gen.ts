@@ -15,8 +15,10 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
 import { Route as DevIndexRouteImport } from './routes/dev.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as ProjectsIdRouteImport } from './routes/projects.$id'
 import { Route as DevUploadRouteImport } from './routes/dev.upload'
 import { Route as DevArchitectureRouteImport } from './routes/dev.architecture'
 import { Route as AdminProjectsRouteImport } from './routes/admin.projects'
@@ -54,6 +56,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProjectsRoute,
+} as any)
 const DevIndexRoute = DevIndexRouteImport.update({
   id: '/dev/',
   path: '/dev/',
@@ -63,6 +70,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const ProjectsIdRoute = ProjectsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ProjectsRoute,
 } as any)
 const DevUploadRoute = DevUploadRouteImport.update({
   id: '/dev/upload',
@@ -101,30 +113,33 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/education': typeof EducationRoute
-  '/projects': typeof ProjectsRoute
+  '/projects': typeof ProjectsRouteWithChildren
   '/admin/education': typeof AdminEducationRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/dev/architecture': typeof DevArchitectureRoute
   '/dev/upload': typeof DevUploadRoute
+  '/projects/$id': typeof ProjectsIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dev/': typeof DevIndexRoute
+  '/projects/': typeof ProjectsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/education': typeof EducationRoute
-  '/projects': typeof ProjectsRoute
   '/admin/education': typeof AdminEducationRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/dev/architecture': typeof DevArchitectureRoute
   '/dev/upload': typeof DevUploadRoute
+  '/projects/$id': typeof ProjectsIdRoute
   '/admin': typeof AdminIndexRoute
   '/dev': typeof DevIndexRoute
+  '/projects': typeof ProjectsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -133,15 +148,17 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/education': typeof EducationRoute
-  '/projects': typeof ProjectsRoute
+  '/projects': typeof ProjectsRouteWithChildren
   '/admin/education': typeof AdminEducationRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/dev/architecture': typeof DevArchitectureRoute
   '/dev/upload': typeof DevUploadRoute
+  '/projects/$id': typeof ProjectsIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dev/': typeof DevIndexRoute
+  '/projects/': typeof ProjectsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -158,23 +175,26 @@ export interface FileRouteTypes {
     | '/admin/projects'
     | '/dev/architecture'
     | '/dev/upload'
+    | '/projects/$id'
     | '/admin/'
     | '/dev/'
+    | '/projects/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/contact'
     | '/education'
-    | '/projects'
     | '/admin/education'
     | '/admin/login'
     | '/admin/messages'
     | '/admin/projects'
     | '/dev/architecture'
     | '/dev/upload'
+    | '/projects/$id'
     | '/admin'
     | '/dev'
+    | '/projects'
   id:
     | '__root__'
     | '/'
@@ -189,8 +209,10 @@ export interface FileRouteTypes {
     | '/admin/projects'
     | '/dev/architecture'
     | '/dev/upload'
+    | '/projects/$id'
     | '/admin/'
     | '/dev/'
+    | '/projects/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -199,7 +221,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   ContactRoute: typeof ContactRoute
   EducationRoute: typeof EducationRoute
-  ProjectsRoute: typeof ProjectsRoute
+  ProjectsRoute: typeof ProjectsRouteWithChildren
   DevArchitectureRoute: typeof DevArchitectureRoute
   DevUploadRoute: typeof DevUploadRoute
   DevIndexRoute: typeof DevIndexRoute
@@ -249,6 +271,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/projects/': {
+      id: '/projects/'
+      path: '/'
+      fullPath: '/projects/'
+      preLoaderRoute: typeof ProjectsIndexRouteImport
+      parentRoute: typeof ProjectsRoute
+    }
     '/dev/': {
       id: '/dev/'
       path: '/dev'
@@ -262,6 +291,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/projects/$id': {
+      id: '/projects/$id'
+      path: '/$id'
+      fullPath: '/projects/$id'
+      preLoaderRoute: typeof ProjectsIdRouteImport
+      parentRoute: typeof ProjectsRoute
     }
     '/dev/upload': {
       id: '/dev/upload'
@@ -326,13 +362,27 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface ProjectsRouteChildren {
+  ProjectsIdRoute: typeof ProjectsIdRoute
+  ProjectsIndexRoute: typeof ProjectsIndexRoute
+}
+
+const ProjectsRouteChildren: ProjectsRouteChildren = {
+  ProjectsIdRoute: ProjectsIdRoute,
+  ProjectsIndexRoute: ProjectsIndexRoute,
+}
+
+const ProjectsRouteWithChildren = ProjectsRoute._addFileChildren(
+  ProjectsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   ContactRoute: ContactRoute,
   EducationRoute: EducationRoute,
-  ProjectsRoute: ProjectsRoute,
+  ProjectsRoute: ProjectsRouteWithChildren,
   DevArchitectureRoute: DevArchitectureRoute,
   DevUploadRoute: DevUploadRoute,
   DevIndexRoute: DevIndexRoute,

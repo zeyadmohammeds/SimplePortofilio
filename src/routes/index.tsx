@@ -143,7 +143,7 @@ function Index() {
                 className={`flex flex-col group ${i % 2 === 1 ? 'lg:mt-32' : ''}`}
               >
                 <TiltCard className="block w-full">
-                  <Link to={`/projects/${project.id}`} className="block">
+                  <Link to="/projects/$id" params={{ id: project.id }} className="block">
                     <div className="aspect-[16/10] w-full overflow-hidden rounded-[2.5rem] bg-muted relative mb-10 shadow-2xl shadow-black/5 ring-1 ring-black/5 transition-transform duration-700">
                       {(() => {
                         const firstImage = (project.images?.[0] || project.image?.split('*')[0]?.trim());
