@@ -17,6 +17,7 @@ import { RobotAssistant } from "@/components/3d/robot-assistant";
 import { Toaster } from "sonner";
 import { emitRobotAction, emitRobotIntent, emitRobotSequence } from "@/lib/robot-state";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { Analytics } from "@vercel/analytics/next";
 
 import appCss from "../styles.css?url";
 
@@ -110,6 +111,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
+        <Analytics />
         <Scripts />
       </body>
     </html>
@@ -247,6 +249,7 @@ function InnerRoot() {
       </ErrorBoundary>
       <Toaster theme={theme as "light" | "dark" | "system"} position="bottom-right" richColors closeButton />
       <Outlet />
+      <Analytics />
     </>
   );
 }
