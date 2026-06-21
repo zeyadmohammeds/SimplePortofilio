@@ -2,8 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageShell } from "@/components/page-shell";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, ArrowRight, Github, Linkedin, MapPin } from "lucide-react";
+import { ArrowRight, Github, Linkedin } from "lucide-react";
 import { toast } from "sonner";
+import { fetchJson } from "@/lib/api-client";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -25,19 +26,10 @@ function Contact() {
     const data = Object.fromEntries(formData.entries());
 
     try {
-      const res = await fetch("https://zeyadportfolio.runasp.net/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (res.ok) {
-        setStatus("success");
-        toast.success("Message sent successfully");
-        (e.target as HTMLFormElement).reset();
-      } else {
-        throw new Error();
-      }
+      await fetchJson("POST", "/api/contact", data);
+      setStatus("success");
+      toast.success("Message sent successfully");
+      (e.target as HTMLFormElement).reset();
     } catch {
       setStatus("error");
       toast.error("Failed to send message");

@@ -50,9 +50,9 @@ interface Project {
 
 const filters = [
   { id: "all", label: "All Works", icon: LayoutGrid },
-  { id: "fullstack", label: "Systems", icon: Layers3 },
-  { id: "frontend", label: "Interfaces", icon: AppWindow },
-  { id: "backend", label: "Engines", icon: Database },
+  { id: "fullstack", label: "Fullstack", icon: Layers3 },
+  { id: "frontend", label: "Frontend", icon: AppWindow },
+  { id: "backend", label: "Backend", icon: Database },
   { id: "mobile", label: "Mobile", icon: Smartphone },
 ] as const;
 
@@ -113,7 +113,7 @@ function Projects() {
           <motion.h1
             className="font-display text-6xl sm:text-7xl md:text-9xl tracking-tight leading-[0.85] text-foreground mb-10 sm:mb-12 overflow-hidden"
           >
-            {"Building".split("").map((letter, i) => (
+            {"The".split("").map((letter, i) => (
               <motion.span
                 key={i}
                 initial={{ y: "100%" }}
@@ -130,7 +130,7 @@ function Projects() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.6, duration: 1 }}
             >
-              Digital
+              Full
             </motion.span>
             <span className="inline-block w-4 md:w-8" />
             <motion.span
@@ -139,7 +139,7 @@ function Projects() {
               transition={{ delay: 0.8, duration: 1.5 }}
               className="text-muted-foreground/30 italic"
             >
-              Landscapes.
+              Spectrum.
             </motion.span>
           </motion.h1>
 

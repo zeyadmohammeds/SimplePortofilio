@@ -119,7 +119,7 @@ function ProjectsAdmin() {
             initial={{ opacity: 0, scale: 0.95 }} 
             animate={{ opacity: 1, scale: 1 }} 
             whileHover={{ scale: 1.02 }}
-            whileActive={{ scale: 0.98 }}
+            whileTap={{ scale: 0.98 }}
             onClick={openNew}
             className="pill-button h-20 px-12 gap-4 text-xs font-bold uppercase tracking-[0.2em] shadow-2xl shadow-primary/10"
           >

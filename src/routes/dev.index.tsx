@@ -396,6 +396,7 @@ function Explorer() {
   }
 
   async function trigger(scenarioIndex: number | "custom") {
+    if (!activeEndpoint) return;
     const key = `${activeEndpoint.id}:${scenarioIndex}`;
     setBusy(key);
     setActiveScenarioIdx(scenarioIndex);

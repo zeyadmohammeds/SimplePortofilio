@@ -125,7 +125,10 @@ export function SiteHeader() {
 
           <nav className="hidden items-center gap-1 sm:flex px-2">
             {nav.map((item) => {
-              const active = loc.pathname === item.to || (item.to !== "/" && loc.pathname.startsWith(item.to));
+              const isParent = nav.some((other) => other.to !== item.to && other.to.startsWith(item.to + "/"));
+              const active = isParent
+                ? loc.pathname === item.to || loc.pathname === item.to + "/"
+                : loc.pathname === item.to || (item.to !== "/" && loc.pathname.startsWith(item.to));
               return (
                 <Link
                   key={item.to}
