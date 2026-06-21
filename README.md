@@ -2,13 +2,17 @@
 
 > A premium portfolio featuring an interactive admin console, CRUD-based project/education management, a live API developer lab, and a 3D architectural topology viewer.
 
+![Home Page](./artifacts/home_page.png)
+![Projects Page](./artifacts/projects_page.png)
+![About Page](./artifacts/about_page.png)
+![Education Page](./artifacts/education_page.png)   
 ![Architecture Page](./artifacts/architecture_page.png)
 
 ---
 
 ## Features
 
-### Public Pages
+### Public Pages 
 - **Home** — Animated hero, selected projects grid with tilt cards, tech marquee, expertise section.
 - **Projects** — Filterable gallery (`frontend` / `backend` / `fullstack` / `mobile`) with live mouse-parallax image previews and individual detail pages.
 - **Project Detail** — Hero image, description, image gallery, tech stack, metrics, external links.

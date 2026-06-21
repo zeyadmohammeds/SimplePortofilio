@@ -1,10 +1,18 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell } from "@/components/page-shell";
 import { Canvas } from "@react-three/fiber";
 import { motion } from "framer-motion";
 import { SystemArchitecture3D } from "@/components/3d/system-nodes";
-import { ArrowRight, Database, Layers3, Lock, Network, Server, Sparkles, Orbit } from "lucide-react";
+import { useApi } from "@/hooks/use-api";
+import { ArrowRight, Braces, Cpu, Globe, Lock, Network, Orbit, Server, Sparkles, Wifi, Workflow } from "lucide-react";
+
+interface ArchProject {
+  id: string;
+  name: string;
+  stack: string[];
+  type: string | number;
+}
 
 export const Route = createFileRoute("/dev/architecture")({
   head: () => ({
@@ -17,6 +25,48 @@ export const Route = createFileRoute("/dev/architecture")({
 });
 
 function Architecture() {
+  const { data: projectsData } = useApi<ArchProject[]>("/api/projects");
+  const projects = Array.isArray(projectsData) ? projectsData : [];
+
+  const aggregatedStack = useMemo(() => {
+    const counts: Record<string, number> = {};
+    projects.forEach(p => (p.stack || []).forEach(s => { counts[s] = (counts[s] || 0) + 1; }));
+    return Object.entries(counts)
+      .sort(([, a], [, b]) => b - a)
+      .map(([name, count]) => ({ name, count, pct: Math.round((count / projects.length) * 100) }));
+  }, [projects]);
+
+  const totalTechs = aggregatedStack.length;
+
+  const layerCards = [
+    { icon: Globe, label: "Core Layer", value: "React 19 + TanStack", desc: "Type-safe routing, server rendering, and reactive UI primitives." },
+    { icon: Cpu, label: "Service Layer", value: ".NET 8 + CQRS", desc: "MediatR pipeline with command/query segregation and middleware." },
+    { icon: Server, label: "Persistence", value: "PostgreSQL + EF Core", desc: "Relational storage with code-first migrations and optimized queries." },
+    { icon: Lock, label: "Security", value: "JWT + RBAC", desc: "Token-based auth with role-driven access control layers." },
+  ];
+
+  const insightCards = [
+    {
+      icon: Cpu,
+      title: "Frontend Layer",
+      body: aggregatedStack.filter(s => ["React","TypeScript","TailwindCSS","Framer Motion","Three.js","Vite"].includes(s.name)).slice(0, 4).length > 0
+        ? `A ${aggregatedStack.filter(s => ["React","TypeScript","TailwindCSS","Framer Motion","Three.js","Vite"].includes(s.name)).slice(0, 4).map(s => s.name).join(", ")} ecosystem delivering high-fidelity interactive experiences.`
+        : "A modular React ecosystem utilizing TanStack Router for type-safe orchestration and Framer Motion for high-fidelity interactive feedback.",
+    },
+    {
+      icon: Workflow,
+      title: "Application Layer",
+      body: aggregatedStack.filter(s => [".NET","PostgreSQL","Redis","Docker","C#"].includes(s.name)).slice(0, 4).length > 0
+        ? `Built on ${aggregatedStack.filter(s => [".NET","PostgreSQL","Redis","Docker","C#"].includes(s.name)).slice(0, 4).map(s => s.name).join(", ")} with CQRS pattern for predictable data flows.`
+        : "Built on .NET 8, the service layer implements a Command Query Responsibility Segregation (CQRS) pattern for predictable data flows.",
+    },
+    {
+      icon: Wifi,
+      title: "Experience Layer",
+      body: "The final synthesis of aesthetics and engineering, where editorial typography meets robust system-level telemetry.",
+    },
+  ];
+
   return (
     <PageShell>
       <div className="pb-32 selection:bg-primary/20">
@@ -38,17 +88,12 @@ function Architecture() {
               </h1>
               
               <p className="max-w-xl text-2xl leading-relaxed text-muted-foreground italic">
-                Mapping the high-fidelity distribution of services, data nodes, and client-side orchestration that powers the ZeyadOS environment.
+                Live data from {projects.length} projects — {totalTechs} unique technologies powering the ZeyadOS environment.
               </p>
             </motion.div>
             
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-1">
-              {[
-                { icon: Layers3, label: "Core Layer", value: "React 19 + TanStack" },
-                { icon: Server, label: "Service Layer", value: ".NET 8 + MediatR" },
-                { icon: Database, label: "Persistence", value: "PostgreSQL + EF Core" },
-                { icon: Lock, label: "Security", value: "JWT + RBAC" },
-              ].map((item, i) => (
+              {layerCards.map((item, i) => (
                 <motion.div
                   key={item.label}
                   initial={{ opacity: 0, x: 20 }}
@@ -61,6 +106,7 @@ function Architecture() {
                       {item.label}
                     </div>
                     <div className="text-xl font-bold tracking-tight text-foreground">{item.value}</div>
+                    <div className="text-xs text-muted-foreground/60 italic">{item.desc}</div>
                   </div>
                   <div className="h-12 w-12 flex items-center justify-center rounded-2xl bg-muted/50 text-muted-foreground group-hover:bg-primary/5 group-hover:text-primary transition-all">
                     <item.icon className="h-5 w-5" />
@@ -69,6 +115,56 @@ function Architecture() {
               ))}
             </div>
           </div>
+        </section>
+
+        {/* Real Tech Stack from API */}
+        <section className="responsive-shell pb-24">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-[0.4em] text-primary mb-12">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              Live Technology Stack
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {aggregatedStack.map((tech, i) => (
+                <motion.div
+                  key={tech.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.03, duration: 0.5 }}
+                  className="rounded-2xl border border-border bg-white p-6 flex items-center justify-between group hover:border-primary/20 transition-all dark:bg-white/5"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                      <Braces className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold text-foreground">{tech.name}</div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
+                        {tech.count} project{tech.count > 1 ? 's' : ''}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-lg font-display text-primary">{tech.pct}%</div>
+                    <div className="h-1.5 w-20 rounded-full bg-muted overflow-hidden mt-1">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${tech.pct}%` }}
+                        transition={{ duration: 1, delay: i * 0.05 }}
+                        className="h-full rounded-full bg-primary"
+                      />
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </section>
 
         {/* 3D Topology View */}
@@ -96,7 +192,6 @@ function Architecture() {
             </div>
             
             <div className="h-[640px] overflow-hidden rounded-[3rem] bg-[#0A0A0A] relative group">
-              {/* Subtle noise texture over the 3D view */}
               <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat z-10" />
               
               <Canvas camera={{ position: [0, 2, 10], fov: 40 }} shadows dpr={[1, 2]}>
@@ -119,20 +214,7 @@ function Architecture() {
         {/* Insight Cards */}
         <section className="responsive-shell">
           <div className="grid gap-12 lg:grid-cols-3">
-            {[
-              {
-                title: "Frontend Layer",
-                body: "A modular React ecosystem utilizing TanStack Router for type-safe orchestration and Framer Motion for high-fidelity interactive feedback.",
-              },
-              {
-                title: "Application Layer",
-                body: "Built on .NET 8, the service layer implements a Command Query Responsibility Segregation (CQRS) pattern for predictable data flows.",
-              },
-              {
-                title: "Experience Layer",
-                body: "The final synthesis of aesthetics and engineering, where editorial typography meets robust system-level telemetry.",
-              },
-            ].map((item, index) => (
+            {insightCards.map((item, index) => (
               <motion.div
                 key={item.title}
                 initial={{ opacity: 0, y: 30 }}
@@ -142,7 +224,7 @@ function Architecture() {
                 className="rounded-[3rem] border border-border bg-white p-12 group hover:border-primary/20 transition-all dark:bg-white/5"
               >
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/5 text-primary mb-10 group-hover:scale-110 transition-transform duration-500">
-                  <Sparkles className="h-6 w-6" />
+                  <item.icon className="h-6 w-6" />
                 </div>
                 <h2 className="font-display text-4xl mb-6 text-foreground group-hover:text-primary transition-colors">{item.title}</h2>
                 <p className="text-lg leading-relaxed text-muted-foreground italic mb-10">{item.body}</p>

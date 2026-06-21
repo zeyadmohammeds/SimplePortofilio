@@ -215,25 +215,6 @@ const endpointCards: EndpointCard[] = [
     ],
   },
   {
-    id: "admin-upload",
-    group: "Admin",
-    method: "POST",
-    path: "/api/admin/upload",
-    summary: "Upload binary assets (images) to the edge storage.",
-    scenarios: [
-      {
-        kind: "success",
-        label: "Upload Image",
-        hint: "Multipart/form-data upload simulation.",
-        build: ({ adminToken }) => ({ 
-          method: "POST", 
-          url: "/api/admin/upload", 
-          headers: authHeader(adminToken),
-        }),
-      },
-    ],
-  },
-  {
     id: "admin-education",
     group: "Admin",
     method: "GET",
@@ -349,7 +330,7 @@ interface ScenarioState { resourceId: string; body: string; }
 function Explorer() {
   const { token, setToken, user } = useApp();
   const [adminToken, setAdminToken] = useState<string | null>(null);
-  const [activeEndpointId, setActiveEndpointId] = useState(endpointCards[0].id);
+  const [activeEndpointId, setActiveEndpointId] = useState<string | null>(null);
   const [activeScenarioIdx, setActiveScenarioIdx] = useState<number | "custom">(0);
   const [responses, setResponses] = useState<Record<string, ApiResponse>>({});
   const [busy, setBusy] = useState<string | null>(null);
@@ -357,12 +338,13 @@ function Explorer() {
   const [scenarioStates, setScenarioStates] = useState<Record<string, ScenarioState>>({});
 
   const activeEndpoint = useMemo(
-    () => endpointCards.find((card) => card.id === activeEndpointId) ?? endpointCards[0],
+    () => endpointCards.find((card) => card.id === activeEndpointId) ?? null,
     [activeEndpointId],
   );
 
   // Initialise custom body when endpoint changes
   useEffect(() => {
+    if (!activeEndpoint) return;
     try {
       const defaultScen = activeEndpoint.scenarios.find(s => s.build({ token: null, adminToken: null }).body);
       setCustomBody(defaultScen?.build({ token: null, adminToken: null }).body ?? "{\n  \n}");
@@ -373,6 +355,7 @@ function Explorer() {
 
   // Initialise per-scenario state (body + id) when endpoint changes
   useEffect(() => {
+    if (!activeEndpoint) return;
     setScenarioStates(prev => {
       const next = { ...prev };
       activeEndpoint.scenarios.forEach((scenario, i) => {
@@ -494,7 +477,7 @@ function Explorer() {
     }
   }
 
-  const activeResponse = responses[`${activeEndpoint.id}:${activeScenarioIdx}`];
+  const activeResponse = activeEndpoint ? responses[`${activeEndpoint.id}:${activeScenarioIdx}`] : undefined;
 
   return (
     <PageShell>
@@ -586,198 +569,211 @@ function Explorer() {
 
             {/* Main Panel */}
             <div className="flex flex-col gap-6">
-              {/* Request Builder */}
-              <div className="rounded-[2.5rem] bg-surface p-6 sm:p-10">
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider">
-                    {activeEndpoint.group}
-                  </span>
-                </div>
-
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
-                  <div className="flex flex-1 items-center rounded-2xl bg-background/50 border border-white/5 overflow-hidden p-1.5">
-                    <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-surface rounded-xl">
-                      {activeEndpoint.method}
+              {activeEndpoint ? (
+                <>
+                  <div className="rounded-[2.5rem] bg-surface p-6 sm:p-10">
+                    <div className="flex items-center gap-3 mb-6">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider">
+                        {activeEndpoint.group}
+                      </span>
                     </div>
-                    <div className="px-4 py-2 text-sm font-medium text-foreground font-mono truncate">
-                      {activeEndpoint.path}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => trigger("custom")}
-                    disabled={Boolean(busy)}
-                    className="pill-button shrink-0 h-12"
-                  >
-                    {busy === `${activeEndpoint.id}:custom` ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    ) : (
-                      <Play className="h-4 w-4 mr-2 fill-current" />
-                    )}
-                    Send Request
-                  </button>
-                </div>
 
-                <p className="text-sm font-medium text-muted-foreground mb-8">
-                  {activeEndpoint.summary}
-                </p>
-
-                {["POST", "PUT", "PATCH"].includes(activeEndpoint.method) && (
-                  <div className="mb-8">
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">
-                      Request Body (JSON)
-                    </h3>
-                    <textarea
-                      value={customBody}
-                      onChange={(e) => setCustomBody(e.target.value)}
-                      className="w-full h-48 rounded-2xl bg-background/50 border border-white/5 p-5 font-mono text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 resize-y custom-scrollbar"
-                      spellCheck={false}
-                    />
-                  </div>
-                )}
-
-                <div className="pt-6 border-t border-white/5">
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">
-                    Quick Scenarios
-                  </h3>
-                  <div className="flex flex-col gap-4">
-                    {activeEndpoint.scenarios.map((scenario, index) => {
-                      const Icon = kindIcon[scenario.kind];
-                      const key = `${activeEndpoint.id}:${index}`;
-                      const isBusy = busy === key;
-                      const built0 = scenario.build({ token: null, adminToken: null });
-                      const scenMethod = built0.method;
-                      const needsId = /\/\d+(\/.*)?$/.test(built0.url);
-                      const needsBody = ["POST", "PUT", "PATCH"].includes(scenMethod);
-                      const isDelete = scenMethod === "DELETE";
-                      const isUpdate = scenMethod === "PUT" || scenMethod === "PATCH";
-                      const scenState = getScenState(index);
-
-                      const methodColors: Record<string, string> = {
-                        GET: "text-green-400 bg-green-400/10",
-                        POST: "text-blue-400 bg-blue-400/10",
-                        PUT: "text-amber-400 bg-amber-400/10",
-                        PATCH: "text-amber-400 bg-amber-400/10",
-                        DELETE: "text-red-400 bg-red-400/10",
-                      };
-
-                      const ScenIcon = isDelete ? Trash2 : isUpdate ? Pencil : needsBody ? PlusCircle : Icon;
-
-                      return (
-                        <div key={scenario.label} className="rounded-2xl bg-background/50 border border-white/5 p-6 flex flex-col gap-5 group hover:border-white/10 transition-colors">
-                          {/* Header */}
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex items-center gap-3">
-                              <div className={`flex items-center justify-center w-9 h-9 rounded-full ${isDelete ? "bg-red-400/10" : isUpdate ? "bg-amber-400/10" : "bg-surface"}`}>
-                                <ScenIcon className={`h-4 w-4 ${isDelete ? "text-red-400" : isUpdate ? "text-amber-400" : "text-primary"}`} />
-                              </div>
-                              <div>
-                                <p className="text-sm font-semibold leading-tight">{scenario.label}</p>
-                                <p className="text-xs font-medium text-muted-foreground mt-0.5">{scenario.hint}</p>
-                              </div>
-                            </div>
-                            <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md shrink-0 ${methodColors[scenMethod] ?? "bg-surface text-muted-foreground"}`}>
-                              {scenMethod}
-                            </span>
-                          </div>
-
-                          {/* URL Preview */}
-                          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-black/20 border border-white/5 font-mono text-xs text-muted-foreground">
-                            <span className="text-primary/60 shrink-0">URL</span>
-                            <span className="truncate">{built0.url.replace(/\/\d+/, needsId ? `/{id}` : "" )}</span>
-                          </div>
-
-                          {/* ID Input — for PUT / DELETE routes with a numeric segment */}
-                          {needsId && (
-                            <div className="flex flex-col gap-1.5">
-                              <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
-                                <Hash className="h-3 w-3" /> Resource ID
-                              </label>
-                              <input
-                                type="text"
-                                value={scenState.resourceId}
-                                onChange={e => setScenField(index, "resourceId", e.target.value)}
-                                placeholder="e.g. 1, abc-123"
-                                className="w-full rounded-xl bg-black/30 border border-white/5 px-4 py-2.5 font-mono text-sm text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all"
-                              />
-                            </div>
-                          )}
-
-                          {/* Body Editor — for POST / PUT / PATCH */}
-                          {needsBody && (
-                            <div className="flex flex-col gap-1.5">
-                              <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                                Request Body (JSON)
-                              </label>
-                              <textarea
-                                value={scenState.body}
-                                onChange={e => setScenField(index, "body", e.target.value)}
-                                rows={6}
-                                spellCheck={false}
-                                className="w-full rounded-xl bg-black/30 border border-white/5 px-4 py-3 font-mono text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50 resize-y transition-all custom-scrollbar"
-                              />
-                            </div>
-                          )}
-
-                          {/* Run Button */}
-                          <button
-                            onClick={() => trigger(index)}
-                            disabled={Boolean(busy)}
-                            className={`self-start h-9 px-5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all ${
-                              isDelete
-                                ? "bg-red-500/10 text-red-400 hover:bg-red-500/20"
-                                : "bg-primary/10 text-primary hover:bg-primary/20"
-                            } disabled:opacity-40`}
-                          >
-                            {isBusy ? (
-                              <><Loader2 className="h-3 w-3 animate-spin" /> Running...</>
-                            ) : (
-                              <><Play className="h-3 w-3 fill-current" /> Run</>  
-                            )}
-                          </button>
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
+                      <div className="flex flex-1 items-center rounded-2xl bg-background/50 border border-white/5 overflow-hidden p-1.5">
+                        <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-surface rounded-xl">
+                          {activeEndpoint.method}
                         </div>
-                      );
-                    })}
+                        <div className="px-4 py-2 text-sm font-medium text-foreground font-mono truncate">
+                          {activeEndpoint.path}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => trigger("custom")}
+                        disabled={Boolean(busy)}
+                        className="pill-button shrink-0 h-12"
+                      >
+                        {busy === `${activeEndpoint.id}:custom` ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Play className="h-4 w-4 mr-2 fill-current" />
+                        )}
+                        Send Request
+                      </button>
+                    </div>
+
+                    <p className="text-sm font-medium text-muted-foreground mb-8">
+                      {activeEndpoint.summary}
+                    </p>
+
+                    {["POST", "PUT", "PATCH"].includes(activeEndpoint.method) && (
+                      <div className="mb-8">
+                        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">
+                          Request Body (JSON)
+                        </h3>
+                        <textarea
+                          value={customBody}
+                          onChange={(e) => setCustomBody(e.target.value)}
+                          className="w-full h-48 rounded-2xl bg-background/50 border border-white/5 p-5 font-mono text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 resize-y custom-scrollbar"
+                          spellCheck={false}
+                        />
+                      </div>
+                    )}
+
+                    <div className="pt-6 border-t border-white/5">
+                      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">
+                        Quick Scenarios
+                      </h3>
+                      <div className="flex flex-col gap-4">
+                        {activeEndpoint.scenarios.map((scenario, index) => {
+                          const Icon = kindIcon[scenario.kind];
+                          const key = `${activeEndpoint.id}:${index}`;
+                          const isBusy = busy === key;
+                          const built0 = scenario.build({ token: null, adminToken: null });
+                          const scenMethod = built0.method;
+                          const needsId = /\/\d+(\/.*)?$/.test(built0.url);
+                          const needsBody = ["POST", "PUT", "PATCH"].includes(scenMethod);
+                          const isDelete = scenMethod === "DELETE";
+                          const isUpdate = scenMethod === "PUT" || scenMethod === "PATCH";
+                          const scenState = getScenState(index);
+
+                          const methodColors: Record<string, string> = {
+                            GET: "text-green-400 bg-green-400/10",
+                            POST: "text-blue-400 bg-blue-400/10",
+                            PUT: "text-amber-400 bg-amber-400/10",
+                            PATCH: "text-amber-400 bg-amber-400/10",
+                            DELETE: "text-red-400 bg-red-400/10",
+                          };
+
+                          const ScenIcon = isDelete ? Trash2 : isUpdate ? Pencil : needsBody ? PlusCircle : Icon;
+
+                          return (
+                            <div key={scenario.label} className="rounded-2xl bg-background/50 border border-white/5 p-6 flex flex-col gap-5 group hover:border-white/10 transition-colors">
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex items-center gap-3">
+                                  <div className={`flex items-center justify-center w-9 h-9 rounded-full ${isDelete ? "bg-red-400/10" : isUpdate ? "bg-amber-400/10" : "bg-surface"}`}>
+                                    <ScenIcon className={`h-4 w-4 ${isDelete ? "text-red-400" : isUpdate ? "text-amber-400" : "text-primary"}`} />
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-semibold leading-tight">{scenario.label}</p>
+                                    <p className="text-xs font-medium text-muted-foreground mt-0.5">{scenario.hint}</p>
+                                  </div>
+                                </div>
+                                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md shrink-0 ${methodColors[scenMethod] ?? "bg-surface text-muted-foreground"}`}>
+                                  {scenMethod}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-black/20 border border-white/5 font-mono text-xs text-muted-foreground">
+                                <span className="text-primary/60 shrink-0">URL</span>
+                                <span className="truncate">{built0.url.replace(/\/\d+/, needsId ? `/{id}` : "" )}</span>
+                              </div>
+
+                              {needsId && (
+                                <div className="flex flex-col gap-1.5">
+                                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+                                    <Hash className="h-3 w-3" /> Resource ID
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={scenState.resourceId}
+                                    onChange={e => setScenField(index, "resourceId", e.target.value)}
+                                    placeholder="e.g. 1, abc-123"
+                                    className="w-full rounded-xl bg-black/30 border border-white/5 px-4 py-2.5 font-mono text-sm text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all"
+                                  />
+                                </div>
+                              )}
+
+                              {needsBody && (
+                                <div className="flex flex-col gap-1.5">
+                                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                                    Request Body (JSON)
+                                  </label>
+                                  <textarea
+                                    value={scenState.body}
+                                    onChange={e => setScenField(index, "body", e.target.value)}
+                                    rows={6}
+                                    spellCheck={false}
+                                    className="w-full rounded-xl bg-black/30 border border-white/5 px-4 py-3 font-mono text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50 resize-y transition-all custom-scrollbar"
+                                  />
+                                </div>
+                              )}
+
+                              <button
+                                onClick={() => trigger(index)}
+                                disabled={Boolean(busy)}
+                                className={`self-start h-9 px-5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all ${
+                                  isDelete
+                                    ? "bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                                    : "bg-primary/10 text-primary hover:bg-primary/20"
+                                } disabled:opacity-40`}
+                              >
+                                {isBusy ? (
+                                  <><Loader2 className="h-3 w-3 animate-spin" /> Running...</>
+                                ) : (
+                                  <><Play className="h-3 w-3 fill-current" /> Run</>  
+                                )}
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Response Panel */}
+                  <div className="rounded-[2.5rem] bg-surface p-6 sm:p-10 flex flex-col min-h-[400px]">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground">
+                        Response
+                      </h3>
+                      {activeResponse && (
+                        <div className="flex items-center gap-3">
+                          <div className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            activeResponse.status >= 400 
+                              ? "bg-destructive/10 text-destructive" 
+                              : "bg-success/10 text-success"
+                          }`}>
+                            {activeResponse.status}
+                          </div>
+                          <div className="px-3 py-1 rounded-full bg-background/50 text-xs font-medium text-muted-foreground">
+                            {activeResponse.ms}ms
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex-1 rounded-2xl bg-[#FBFBF9] border border-border p-6 overflow-hidden flex flex-col">
+                      {activeResponse ? (
+                        <div className="flex-1 overflow-auto custom-scrollbar text-sm text-[#1A1A1A]">
+                          <JsonView data={activeResponse.body} />
+                        </div>
+                      ) : (
+                        <div className="flex-1 flex items-center justify-center">
+                          <div className="flex items-center gap-3 text-[#71717A]/50 text-sm font-semibold uppercase tracking-widest">
+                            <TerminalSquare className="h-5 w-5" />
+                            Awaiting Request
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="rounded-[2.5rem] bg-surface p-16 flex flex-col items-center justify-center min-h-[600px] text-center">
+                  <div className="flex h-24 w-24 items-center justify-center rounded-[2.5rem] bg-muted/50 text-muted-foreground/30 mb-10 border border-border">
+                    <TerminalSquare className="h-12 w-12" />
+                  </div>
+                  <h2 className="font-display text-5xl text-foreground/60 mb-6 italic">Select an Endpoint</h2>
+                  <p className="text-lg text-muted-foreground font-medium max-w-md leading-relaxed">
+                    Choose an API endpoint from the directory to inspect its schema, build custom requests, and view live server responses.
+                  </p>
+                  <div className="mt-12 flex items-center gap-4 text-[10px] font-bold uppercase tracking-[0.4em] text-muted-foreground/30">
+                    <div className="h-px w-16 bg-border/50" />
+                    Ready to Transmit
+                    <div className="h-px w-16 bg-border/50" />
                   </div>
                 </div>
-              </div>
-
-              {/* Response Panel */}
-              <div className="rounded-[2.5rem] bg-surface p-6 sm:p-10 flex flex-col min-h-[400px]">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground">
-                    Response
-                  </h3>
-                  {activeResponse && (
-                    <div className="flex items-center gap-3">
-                      <div className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        activeResponse.status >= 400 
-                          ? "bg-destructive/10 text-destructive" 
-                          : "bg-success/10 text-success"
-                      }`}>
-                        {activeResponse.status}
-                      </div>
-                      <div className="px-3 py-1 rounded-full bg-background/50 text-xs font-medium text-muted-foreground">
-                        {activeResponse.ms}ms
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex-1 rounded-2xl bg-[#FBFBF9] border border-border p-6 overflow-hidden flex flex-col">
-                  {activeResponse ? (
-                    <div className="flex-1 overflow-auto custom-scrollbar text-sm text-[#1A1A1A]">
-                      <JsonView data={activeResponse.body} />
-                    </div>
-                  ) : (
-                    <div className="flex-1 flex items-center justify-center">
-                      <div className="flex items-center gap-3 text-[#71717A]/50 text-sm font-semibold uppercase tracking-widest">
-                        <TerminalSquare className="h-5 w-5" />
-                        Awaiting Request
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </section>

@@ -27,7 +27,6 @@ export const userNav = [
 
 const devNav = [
   { to: "/dev", label: "Console" },
-  { to: "/dev/upload", label: "Upload" },
   { to: "/dev/architecture", label: "Architecture" },
 ] as const;
 

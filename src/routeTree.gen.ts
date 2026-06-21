@@ -19,7 +19,6 @@ import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
 import { Route as DevIndexRouteImport } from './routes/dev.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ProjectsIdRouteImport } from './routes/projects.$id'
-import { Route as DevUploadRouteImport } from './routes/dev.upload'
 import { Route as DevArchitectureRouteImport } from './routes/dev.architecture'
 import { Route as AdminProjectsRouteImport } from './routes/admin.projects'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
@@ -76,11 +75,6 @@ const ProjectsIdRoute = ProjectsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ProjectsRoute,
 } as any)
-const DevUploadRoute = DevUploadRouteImport.update({
-  id: '/dev/upload',
-  path: '/dev/upload',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DevArchitectureRoute = DevArchitectureRouteImport.update({
   id: '/dev/architecture',
   path: '/dev/architecture',
@@ -119,7 +113,6 @@ export interface FileRoutesByFullPath {
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/dev/architecture': typeof DevArchitectureRoute
-  '/dev/upload': typeof DevUploadRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dev/': typeof DevIndexRoute
@@ -135,7 +128,6 @@ export interface FileRoutesByTo {
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/dev/architecture': typeof DevArchitectureRoute
-  '/dev/upload': typeof DevUploadRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/admin': typeof AdminIndexRoute
   '/dev': typeof DevIndexRoute
@@ -154,7 +146,6 @@ export interface FileRoutesById {
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/dev/architecture': typeof DevArchitectureRoute
-  '/dev/upload': typeof DevUploadRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dev/': typeof DevIndexRoute
@@ -174,7 +165,6 @@ export interface FileRouteTypes {
     | '/admin/messages'
     | '/admin/projects'
     | '/dev/architecture'
-    | '/dev/upload'
     | '/projects/$id'
     | '/admin/'
     | '/dev/'
@@ -190,7 +180,6 @@ export interface FileRouteTypes {
     | '/admin/messages'
     | '/admin/projects'
     | '/dev/architecture'
-    | '/dev/upload'
     | '/projects/$id'
     | '/admin'
     | '/dev'
@@ -208,7 +197,6 @@ export interface FileRouteTypes {
     | '/admin/messages'
     | '/admin/projects'
     | '/dev/architecture'
-    | '/dev/upload'
     | '/projects/$id'
     | '/admin/'
     | '/dev/'
@@ -223,7 +211,6 @@ export interface RootRouteChildren {
   EducationRoute: typeof EducationRoute
   ProjectsRoute: typeof ProjectsRouteWithChildren
   DevArchitectureRoute: typeof DevArchitectureRoute
-  DevUploadRoute: typeof DevUploadRoute
   DevIndexRoute: typeof DevIndexRoute
 }
 
@@ -298,13 +285,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/projects/$id'
       preLoaderRoute: typeof ProjectsIdRouteImport
       parentRoute: typeof ProjectsRoute
-    }
-    '/dev/upload': {
-      id: '/dev/upload'
-      path: '/dev/upload'
-      fullPath: '/dev/upload'
-      preLoaderRoute: typeof DevUploadRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/dev/architecture': {
       id: '/dev/architecture'
@@ -384,7 +364,6 @@ const rootRouteChildren: RootRouteChildren = {
   EducationRoute: EducationRoute,
   ProjectsRoute: ProjectsRouteWithChildren,
   DevArchitectureRoute: DevArchitectureRoute,
-  DevUploadRoute: DevUploadRoute,
   DevIndexRoute: DevIndexRoute,
 }
 export const routeTree = rootRouteImport
