@@ -119,7 +119,7 @@ function ProjectsAdmin() {
             initial={{ opacity: 0, scale: 0.95 }} 
             animate={{ opacity: 1, scale: 1 }} 
             whileHover={{ scale: 1.02 }}
-            whileActive={{ scale: 0.98 }}
+            whileTap={{ scale: 0.98 }}
             onClick={openNew}
             className="pill-button h-20 px-12 gap-4 text-xs font-bold uppercase tracking-[0.2em] shadow-2xl shadow-primary/10"
           >
@@ -371,19 +371,30 @@ function ProjectDrawer({ project, onClose, onSaved }: { project: Project | null;
                 </div>
                 <input 
                   value={stackInput} 
-                  onChange={e => setStackInput(e.target.value)} 
+                  onChange={e => {
+                    const val = e.target.value;
+                    if (val.includes(",")) {
+                      const items = val.split(",").map(s => s.trim()).filter(Boolean);
+                      if (items.length > 0) {
+                        setDraft(d => ({ ...d, stack: [...d.stack, ...items] }));
+                      }
+                      setStackInput("");
+                    } else {
+                      setStackInput(val);
+                    }
+                  }}
                   onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); if (stackInput.trim()) { setDraft(d => ({ ...d, stack: [...d.stack, stackInput.trim()] })); setStackInput(""); } } }}
                   className="mehaxan-input" 
-                  placeholder="Append new module..." 
+                  placeholder="react, css, typescript or press Enter to add one" 
                 />
               </Field>
 
-              <Field label="Primary Asset URI">
+              <Field label="Primary Asset URI" hint="Separate multiple with *">
                  <div className="flex gap-6 items-end">
                     <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl border border-border bg-white overflow-hidden shadow-inner dark:bg-white/5">
                       {draft.image ? <img src={draft.image} className="h-full w-full object-cover" /> : <ImageIcon className="h-6 w-6 text-muted-foreground/10" />}
                     </div>
-                    <input value={draft.image} onChange={e => setDraft(d => ({ ...d, image: e.target.value }))} className="flex-1 mehaxan-input" placeholder="https://cdn.io/asset.jpg" />
+                    <input value={draft.image} onChange={e => setDraft(d => ({ ...d, image: e.target.value }))} className="flex-1 mehaxan-input" placeholder="https://cdn.io/asset.jpg * https://cdn.io/asset2.jpg" />
                  </div>
               </Field>
 
