@@ -1,11 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { PageShell } from "@/components/page-shell";
 import { useApi } from "@/hooks/use-api";
 import { SideScrollIndicator } from "@/components/ui/side-scroll-indicator";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { Magnetic } from "@/components/ui/magnetic";
-import { ArrowRight, Briefcase, GraduationCap, Github, Linkedin, Mail, Twitter, Instagram } from "lucide-react";
+import { Briefcase, GraduationCap, Github, Linkedin } from "lucide-react";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -27,9 +27,14 @@ interface Profile {
 }
 
 function About() {
-  const experiences = useApi<any[]>("/api/experiences");
   const education = useApi<any[]>("/api/education");
-  
+
+  const experiences = [
+    { id: "1", position: "Software Architect", company: "Freelance / Self-Employed", startDate: "2024", endDate: "", description: "Architecting full-stack solutions with React, .NET, and PostgreSQL. Delivering premium digital experiences from concept to deployment." },
+    { id: "2", position: "Full Stack Developer", company: "Digital Agency Work", startDate: "2022", endDate: "2024", description: "Built and maintained production-grade web applications. Designed APIs, integrated third-party services, and optimized frontend performance." },
+    { id: "3", position: "Frontend Developer", company: "Tech Startup", startDate: "2020", endDate: "2022", description: "Developed interactive UI components with React and TypeScript. Collaborated on design systems and improved accessibility across the platform." },
+  ];
+
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -67,14 +72,22 @@ function About() {
               </div>
             </motion.div>
 
-            <div className="relative aspect-[4/5] rounded-[3rem] overflow-hidden bg-muted shadow-2xl shadow-black/10">
+            <div className="relative aspect-[4/5] rounded-[3rem] overflow-hidden bg-muted shadow-2xl shadow-black/10 group/image">
+              <div className="absolute -inset-2 rounded-[4rem] bg-gradient-to-br from-primary/20 via-transparent to-primary/10 opacity-0 group-hover/image:opacity-100 transition-opacity duration-700 blur-xl pointer-events-none" />
               <motion.img 
                 style={{ y: imgY, scale: 1.1 }}
-                src="me.png" 
+                src="/about.png" 
                 alt="Zeyad Mohammed"
-                className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                className="w-full h-full object-cover grayscale group-hover/image:grayscale-0 transition-all duration-1000 scale-105 group-hover/image:scale-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-background/10 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-[3rem] pointer-events-none" />
+              <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover/image:opacity-100 transition-opacity duration-500 pointer-events-none">
+                <div className="flex items-center gap-3">
+                  <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white">Zeyad Mohammed — Cairo, EG</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -87,7 +100,7 @@ function About() {
               </div>
               
               <div className="space-y-12">
-                {(experiences.data || []).map((exp: any, i) => (
+                {experiences.map((exp, i) => (
                   <motion.div 
                     key={exp.id}
                     initial={{ opacity: 0, x: -20 }}
